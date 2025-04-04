@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Digital Library</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>My Digital Library</h1>
+        <div class="nav-links">
+            <a href="/add_author">Add Author</a> | <a href="/add_book">Add Book</a>
+        </div>
+
+        <form class="search-bar" method="GET" action="{{ url_for('home') }}">
+            <input type="text" name="search" placeholder="Search for a book" value="{{ request.args.get('search', '') }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <form class="sort-bar" method="GET" action="{{ url_for('home') }}">
+            <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+            <select name="sort_by" onchange="this.form.submit()">
+                <option value="title" {% if request.args.get('sort_by') == 'title' %}selected{% endif %}>Sort by Title</option>
+                <option value="author" {% if request.args.get('sort_by') == 'author' %}selected{% endif %}>Sort by Author</option>
+            </select>
+        </form>
+
+        {% if books %}
+            <ul>
+            {% for book in books %}
+                <li>
+                    <span><strong>{{ book.title }}</strong> by {{ book.author.name }} ({{ book.publication_year }})</span>
+                    <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No books found</p>
+        {% endif %}
+    </div>
+</body>
+</html>
